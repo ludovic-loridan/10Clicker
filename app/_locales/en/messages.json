@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "10Clicker",
+    "description": "The name of the application"
+  },
+  "appDescription": {
+    "message": "Delay a click on any button",
+    "description": "The description of the application"
+  }
+}

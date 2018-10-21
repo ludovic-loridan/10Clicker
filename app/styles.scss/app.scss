@@ -1,0 +1,38 @@
+$green: #2AEDA9;
+$red: #ED7A2A;
+
+#TC-overlay {
+  position: fixed;
+  top: 0; left: 0; right:0; bottom:0;
+  z-index: 2147483648;
+  background: rgba(0,0,0,0.75);
+  pointer-events: none;
+
+  &.is-showing-timer {
+    pointer-events: auto;
+  }
+
+  .TC-timer {
+    font-size: 20px;
+    font-weight: bold;
+    background: rgba(0,0,0,0.70);
+    color: $green;
+    width: 120px;
+    height: 120px;
+    line-height: 120px;
+    text-align: center;
+    border-radius: 100%;
+
+    .TC-timer-countdown {display: block;}
+    .TC-timer-cancel {display: none;}
+
+    &:hover {
+      .TC-timer-countdown {display: none;}
+      .TC-timer-cancel {display: block;}
+
+      color: $red;
+      cursor: pointer;
+    }
+  }
+}
+
