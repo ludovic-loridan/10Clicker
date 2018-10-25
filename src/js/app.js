@@ -1,86 +1,74 @@
+'use strict';
+
+import '../css/app.scss';
 
 //
 // BUTTON PICKER
 //
 
-
-const ButtonPicker = {
-    onMouseClick(e) {
-        const target = e.target;
+var ButtonPicker = {
+    onMouseClick: function onMouseClick(e) {
+        var target = e.target;
         e.preventDefault();
         e.stopPropagation();
-    
-    
-        const button = target.closest('button, input[type="submit"],.btn,a');
+
+        var button = target.closest('button, input[type="submit"],.btn, .Button , a, [role="button"]');
         if (button) {
             ButtonPicker.options.onButtonPick(button);
         }
-        
     },
-    
-    onFocus(e) {
+    onFocus: function onFocus(e) {
         e.preventDefault();
         e.stopPropagation();
     },
-    
-    start(options={}) {
+    start: function start() {
+        var options = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {};
+
         ButtonPicker.options = options;
         document.addEventListener('click', ButtonPicker.onMouseClick, true);
         document.addEventListener('focus', ButtonPicker.onFocus, true);
     },
-    
-    stop() {
+    stop: function stop() {
         document.removeEventListener('click', ButtonPicker.onMouseClick, true);
         document.removeEventListener('focus', ButtonPicker.onFocus, true);
     }
 };
 
-
 //
 // TIMER
 //
 
-const Timer = {
-
-    createEl() {
-        const el = document.createElement('div');
+var Timer = {
+    createEl: function createEl() {
+        var el = document.createElement('div');
         el.classList.add('TC-timer');
-        el.innerHTML = `
-            <span class="TC-timer-countdown"></span>
-            <span class="TC-timer-cancel">X</span>
-        `;
+        el.innerHTML = '\n            <span class="TC-timer-countdown"></span>\n            <span class="TC-timer-cancel">X</span>\n        ';
         Timer.options.region.appendChild(el);
         Timer.el = el;
         Timer.el.addEventListener('click', Timer.options.onCancel, true);
     },
-
-    renderEl() {
+    renderEl: function renderEl() {
         Timer.el.querySelector('.TC-timer-countdown').innerHTML = formatTime(Timer.remainingSeconds);
     },
-
-    removeEl() {
+    removeEl: function removeEl() {
         Timer.el.remove();
     },
-
-    tick() {
+    tick: function tick() {
         Timer.remainingSeconds--;
-        Timer.renderEl()
+        Timer.renderEl();
         if (Timer.remainingSeconds === 0) {
             Timer.stop();
             Timer.options.onFinish();
         }
     },
-
-    disableEvent(e) {
+    disableEvent: function disableEvent(e) {
         e.stopPropagation();
         e.preventDefault();
     },
-
-    warnBeforeUnload(e) {
+    warnBeforeUnload: function warnBeforeUnload(e) {
         e.returnValue = 'A timer is running. Are you sure you want to leave ?';
     },
-
-    start(options) {
+    start: function start(options) {
         Timer.options = options;
         Timer.remainingSeconds = 600;
         Timer.createEl();
@@ -94,8 +82,7 @@ const Timer = {
 
         window.addEventListener('beforeunload', Timer.warnBeforeUnload, true);
     },
-
-    stop() {
+    stop: function stop() {
         Timer.removeEl();
         clearInterval(Timer.intervalId);
         document.removeEventListener('wheel', Timer.disableEvent, true);
@@ -104,86 +91,73 @@ const Timer = {
 
         window.removeEventListener('beforeunload', Timer.warnBeforeUnload, true);
     }
-}
- 
+};
 
 // STATES :
 // - PICK_BUTTON
 // - TIMER
 
-const App = {
+var App = {
 
     currentModule: ButtonPicker,
 
-    createOverlay() {
+    createOverlay: function createOverlay() {
         App.overlay = document.createElement('div');
         App.overlay.id = 'TC-overlay';
         document.body.appendChild(App.overlay);
     },
-
-    removeOverlay() {
+    removeOverlay: function removeOverlay() {
         App.overlay.remove();
     },
-
-    onKeyUp(e) {
+    onKeyUp: function onKeyUp(e) {
         if (e.key == 'Escape') {
             App.stop();
         }
         e.preventDefault();
         e.stopPropagation();
     },
-
-    startModule(module, options) {
+    startModule: function startModule(module, options) {
         App.currentModule.stop();
         App.currentModule = module;
         App.currentModule.start(options);
     },
-
-    onButtonPick(button) {
+    onButtonPick: function onButtonPick(button) {
         ButtonPicker.stop();
         App.selectedButton = button;
         App.overlay.classList.add('is-showing-timer');
         App.startModule(Timer, {
             region: App.overlay,
-            button,
+            button: button,
             onFinish: App.onTimerFinish,
-            onCancel: () => App.stop()
+            onCancel: function onCancel() {
+                return App.stop();
+            }
         });
     },
-
-    onTimerFinish() {
+    onTimerFinish: function onTimerFinish() {
         App.stop();
         App.selectedButton.click();
     },
-
-    start() {
+    start: function start() {
         App.createOverlay();
-        App.startModule(ButtonPicker, {onButtonPick: App.onButtonPick});
+        App.startModule(ButtonPicker, { onButtonPick: App.onButtonPick });
         document.addEventListener('keyup', App.onKeyUp, true); // todo do better
     },
-
-    stop() {
+    stop: function stop() {
         App.removeOverlay();
         App.currentModule.stop();
         document.removeEventListener('keyup', App.onKeyUp, true);
     }
-}
+};
 
 App.start();
 
-
-
-
-
-
 // UTILS
 function formatTime(seconds) {
-    const h = Math.floor(seconds / 3600);
-    const m = Math.floor((seconds % 3600) / 60);
-    const s = seconds % 60;
-    return [
-      h,
-      m > 9 ? m : (h ? '0' + m : m || '0'),
-      s > 9 ? s : '0' + s,
-    ].filter(a => a).join(':');
-  }
+    var h = Math.floor(seconds / 3600);
+    var m = Math.floor(seconds % 3600 / 60);
+    var s = seconds % 60;
+    return [h, m > 9 ? m : h ? '0' + m : m || '0', s > 9 ? s : '0' + s].filter(function (a) {
+        return a;
+    }).join(':');
+}
